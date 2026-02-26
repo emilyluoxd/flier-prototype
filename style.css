@@ -1,0 +1,391 @@
+/* ============================================
+   STREET ARCHIVE — style.css
+   ============================================ */
+
+:root {
+  --ink: #f4f3a7;
+  --paper: #202f50;
+  --paper-dark: #e8e2d4;
+  --accent: #c8390a;
+  --modal-bg: rgba(18, 16, 12, 0.92);
+  --scene-height: 520px;
+  --scene-width: 3200px;
+  /* ← change this if you add more objects */
+}
+
+.scene svg {
+  pointer-events: none;
+}
+
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  background: var(--paper);
+  color: var(--ink);
+  font-family: 'Courier Prime', monospace;
+  overflow: hidden;
+  height: 100vh;
+  width: 100vw;
+  cursor: default;
+}
+
+/* ── INTRO ─────────────────────────────────── */
+.intro {
+  position: fixed;
+  inset: 0;
+  background: var(--paper);
+  z-index: 200;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: opacity 0.8s ease;
+}
+
+.intro.hidden {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.intro-inner {
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+}
+
+.intro-label {
+  font-size: 11px;
+  letter-spacing: 0.25em;
+  text-transform: uppercase;
+  opacity: 0.5;
+}
+
+.intro-title {
+  font-family: 'IM Fell English', serif;
+  font-size: clamp(56px, 10vw, 96px);
+  line-height: 1;
+  color: var(--ink);
+}
+
+.intro-sub {
+  font-size: 14px;
+  line-height: 1.8;
+  opacity: 0.6;
+  font-style: italic;
+}
+
+.intro-btn {
+  margin-top: 12px;
+  background: var(--ink);
+  color: var(--paper);
+  border: none;
+  font-family: ff-market-web, sans-serif;
+  font-weight: 700;
+  font-style: bold;
+  font-size: 18px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  padding: 12px 36px;
+  cursor: pointer;
+  transition: background 0.2s;
+  /* Set the image as the background */
+}
+
+.intro-btn:hover {
+  background: var(--accent);
+}
+
+/* ── VIEWPORT & SCENE ───────────────────────── */
+.viewport {
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
+  position: relative;
+  display: flex;
+  align-items: flex-end;
+}
+
+.scene {
+  position: relative;
+  width: var(--scene-width);
+  height: var(--scene-height);
+  will-change: transform;
+  transition: transform 0.05s linear;
+  flex-shrink: 0;
+}
+
+/* ── LAYERS ─────────────────────────────────── */
+.layer {
+  position: absolute;
+}
+
+
+
+.obj {
+  /* All street objects sit on the ground line */
+  image-rendering: crisp-edges;
+}
+
+/* ── FLIERS ─────────────────────────────────── */
+.flier-pin {
+  cursor: pointer;
+  animation: wiggle 3s steps(3) infinite;
+  transform-origin: bottom center;
+  /* filter: drop-shadow(2px 3px 6px rgba(0,0,0,0.18)); */
+}
+
+
+
+.flier-pin:hover {
+  animation: wiggle-hover 0.3s steps(3) forwards;
+  filter: drop-shadow(3px 5px 10px rgba(235, 255, 54, 0.28));
+}
+
+@@keyframes wiggle {
+  0% {
+    transform: rotate(0deg);
+  }
+
+  25% {
+    transform: rotate(-2deg);
+  }
+
+  75% {
+    transform: rotate(2deg);
+  }
+
+  100% {
+    transform: rotate(0deg);
+  }
+}
+
+@keyframes wiggle-hover {
+  0% {
+    transform: scale(1) rotate(0deg);
+  }
+
+  50% {
+    transform: scale(1.54) rotate(-2deg);
+  }
+
+  100% {
+    transform: scale(2.06) rotate(1deg);
+  }
+}
+
+
+/* ── SCROLL HINT ────────────────────────────── */
+.scroll-hint {
+  position: fixed;
+  bottom: 28px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 11px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  opacity: 0.4;
+  pointer-events: none;
+  transition: opacity 1s ease;
+  animation: nudge 2.5s ease-in-out infinite;
+}
+
+.scroll-hint.hidden {
+  opacity: 0;
+}
+
+@keyframes nudge {
+
+  0%,
+  100% {
+    transform: translateX(-50%);
+  }
+
+  50% {
+    transform: translateX(calc(-50% + 6px));
+  }
+}
+
+/* ── MODAL ──────────────────────────────────── */
+.modal {
+  position: fixed;
+  inset: 0;
+  background: var(--modal-bg);
+  z-index: 100;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 20px;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.4s ease;
+}
+
+.modal.active {
+  opacity: 1;
+  pointer-events: all;
+}
+
+/* Card flip container */
+.modal-card {
+  width: min(340px, 80vw);
+  height: min(480px, 70vh);
+  position: relative;
+  transform-style: preserve-3d;
+  transition: transform 0.65s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.modal-card.flipped {
+  transform: rotateY(180deg);
+}
+
+.card-front,
+.card-back {
+  position: absolute;
+  inset: 0;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+.card-front {
+  background: var(--paper-dark);
+}
+
+.card-front img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  padding: 12px;
+}
+
+.card-back {
+  background: var(--paper);
+  transform: rotateY(180deg);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 32px 28px;
+  gap: 14px;
+}
+
+.back-label {
+  font-size: 10px;
+  letter-spacing: 0.25em;
+  text-transform: uppercase;
+  opacity: 0.4;
+}
+
+.back-title {
+  font-family: 'IM Fell English', serif;
+  font-size: 20px;
+  line-height: 1.3;
+  color: var(--ink);
+}
+
+.tag-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.tag {
+  background: var(--ink);
+  color: var(--paper);
+  font-size: 10px;
+  letter-spacing: 0.1em;
+  padding: 4px 10px;
+  border-radius: 1px;
+}
+
+.back-note {
+  font-size: 12px;
+  line-height: 1.7;
+  color: var(--ink);
+  opacity: 0.75;
+  font-style: italic;
+}
+
+.back-meta {
+  font-size: 10px;
+  opacity: 0.4;
+  letter-spacing: 0.05em;
+}
+
+/* Buttons */
+.flip-btn {
+  background: var(--paper);
+  color: var(--ink);
+  border: none;
+  font-family: 'Courier Prime', monospace;
+  font-size: 11px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  padding: 10px 28px;
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s;
+}
+
+.flip-btn:hover {
+  background: var(--accent);
+  color: var(--paper);
+}
+
+.close-btn {
+  position: fixed;
+  top: 24px;
+  right: 28px;
+  background: none;
+  border: none;
+  color: var(--paper);
+  font-family: 'Courier Prime', monospace;
+  font-size: 11px;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  cursor: pointer;
+  opacity: 0.7;
+  transition: opacity 0.2s;
+}
+
+.close-btn:hover {
+  opacity: 1;
+}
+
+/* ── GRAIN OVERLAY ──────────────────────────── */
+body::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+  background-size: 200px 200px;
+  opacity: 0.6;
+  z-index: 300;
+}
+
+.logo {
+  position: fixed;
+  top: 20px;
+  left: 24px;
+  z-index: 150;
+  display: block;
+  width: clamp(140px, 6vw, 200px);
+}
+
+.logo img {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+.surface path {
+  fill: #f4f3a7;
+  /* change this to any colour */
+}
